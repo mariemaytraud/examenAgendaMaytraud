@@ -1,2 +1,10 @@
 Ecrire ici votre réponse à la question UML.
 
+La solution utilisée (Figure 2 - Composition) Dans ce modèle, on utilise la composition : un Event possède (ou non) un attribut Repetition.
+ C'est beaucoup plus souple. Si je crée un événement simple, je peux décider de le rendre répétitif sans devoir tout casser. Il suffit d'ajouter l'objet répétition à mon événement existant. L'objet peut évoluer.
+
+2. La solution alternative (Figure 3 - Héritage) Dans ce modèle, on utilise l'héritage : on crée une classe spéciale RepetitiveEvent qui hérite de Event.
+Le problème est que c'est trop rigide. Une fois que j'ai créé un objet Event (simple), il est "coincé" dans ce type. Si je veux qu'il devienne répétitif plus tard, je ne peux pas le transformer. Je serais obligé de supprimer mon événement et d'en créer un nouveau en copiant toutes les données, ce qui est lourd et source d'erreurs.
+
+En conclusion je choisis la solution 1 (Composition) car elle permet de modifier le comportement des événements dynamiquement, alors que l'héritage fige les choses dès la création de l'objet.
+

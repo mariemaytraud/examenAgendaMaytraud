@@ -1,12 +1,15 @@
 package agenda;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Repetition {
+    public final ChronoUnit myFrequency;
+    private final List<LocalDate> myExceptions = new ArrayList<>();
+    private Termination myTermination;
+
     public ChronoUnit getFrequency() {
         return myFrequency;
     }
@@ -19,7 +22,7 @@ public class Repetition {
      * <LI>ChronoUnit.MONTHS for monthly repetitions</LI>
      * </UL>
      */
-    private final ChronoUnit myFrequency;
+   
 
     public Repetition(ChronoUnit myFrequency) {
         this.myFrequency = myFrequency;
@@ -30,17 +33,24 @@ public class Repetition {
      * @param date un date à laquelle l'événement ne doit pas se répéter
      */
     public void addException(LocalDate date) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.myExceptions.add(date);
+
     }
+
+    public List<LocalDate> getExceptions() {
+        return myExceptions;
+    }   
 
     /**
      * La terminaison d'une répétition (optionnelle)
      * @param termination la terminaison de la répétition
      */
     public void setTermination(Termination termination) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.myTermination = termination;
 
     }
+    public Termination getTermination() {
+        return myTermination;
+    }
+
 }

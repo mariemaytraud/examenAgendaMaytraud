@@ -1,6 +1,8 @@
 package agenda;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class Event {
@@ -19,6 +21,7 @@ public class Event {
      * The durarion of the event 
      */
     private Duration myDuration;
+    private Repetition repetition;
 
 
     /**
@@ -35,33 +38,41 @@ public class Event {
     }
 
     public void setRepetition(ChronoUnit frequency) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.repetition = new Repetition(frequency);
     }
 
     public void addException(LocalDate date) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        if (repetition != null) {
+            this.repetition.addException(date);
+        } 
     }
 
     public void setTermination(LocalDate terminationInclusive) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+       if ( repetition != null) {
+            Termination term = new Termination(myStart.toLocalDate(), repetition.getFrequency(), terminationInclusive);
+              repetition.setTermination(term);
+       }
     }
 
     public void setTermination(long numberOfOccurrences) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        if (repetition != null) {
+            Termination term = new Termination(myStart.toLocalDate(), repetition.getFrequency(), numberOfOccurrences);
+            repetition.setTermination(term);
     }
+}
 
     public int getNumberOfOccurrences() {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        if (repetition != null && repetition.getTermination() != null) {
+            return (int) repetition.getTermination().numberOfOccurrences();
+        }
+        return 1; 
     }
 
     public LocalDate getTerminationDate() {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        if (repetition != null && repetition.getTermination() != null) {
+            return repetition.getTermination().terminationDateInclusive();
+        }
+        return null;
     }
 
     /**
@@ -71,8 +82,48 @@ public class Event {
      * @return true if the event occurs on that day, false otherwise
      */
     public boolean isInDay(LocalDate aDay) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        LocalDateTime dayStart = aDay.atStartOfDay();
+        LocalDateTime dayEnd = aDay.plusDays(1).atStartOfDay();
+
+        //cas 1 
+        if (repetition == null) {
+            LocalDateTime eventEnd = myStart.plus(myDuration);
+        
+            return myStart.isBefore(dayEnd) && eventEnd.isAfter(dayStart);
+        }
+
+        //cas 2
+        if (repetition.getExceptions().contains(aDay)) {
+            return false; 
+        }
+        long durationInDays = myDuration.toDays(); 
+        
+        for (long i = 0; i <= durationInDays + 1; i++) {
+            LocalDate candidateDate = aDay.minusDays(i);
+           
+            long units = repetition.getFrequency().between(myStart.toLocalDate(), candidateDate);
+            LocalDate theoreticalDate = myStart.toLocalDate().plus(units, repetition.getFrequency());
+
+            if (theoreticalDate.equals(candidateDate) && units >= 0) {
+        
+                if (repetition.getExceptions().contains(candidateDate)) {
+                    continue; 
+                }
+    
+                if (repetition.getTermination() != null && candidateDate.isAfter(repetition.getTermination().terminationDateInclusive())) {
+                    continue; 
+                }
+                
+                LocalDateTime occStart = LocalDateTime.of(candidateDate, myStart.toLocalTime());
+                LocalDateTime occEnd = occStart.plus(myDuration);
+                
+                if (occStart.isBefore(dayEnd) && occEnd.isAfter(dayStart)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
    
     /**
